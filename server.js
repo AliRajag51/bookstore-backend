@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes.js";
 import bookRoutes from "./routes/book.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/books", bookRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api", userRoutes);
 
 app.get("/", (req, res) => {

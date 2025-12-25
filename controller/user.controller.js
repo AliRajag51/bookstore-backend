@@ -3,6 +3,8 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import User from "../model/User.js";
+import Book from "../model/Book.js";
+import Order from "../model/Order.js";
 
 const cookieOptions = {
   httpOnly: true,
@@ -408,5 +410,27 @@ export const deleteUser = async (req, res) => {
     return res.status(200).json({ message: "User deleted" });
   } catch (err) {
     return res.status(500).json({ message: "Delete user failed", error: err.message });
+  }
+};
+
+export const getStats = async (req, res) => {
+  try {
+    const [users, books, activeBooks, orders] = await Promise.all([
+      User.countDocuments(),
+      Book.countDocuments(),
+      Book.countDocuments({ isActive: true }),
+      Order.countDocuments(),
+    ]);
+
+    return res.status(200).json({
+      stats: {
+        users,
+        books,
+        activeBooks,
+        orders,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Fetch stats failed", error: err.message });
   }
 };

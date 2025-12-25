@@ -288,6 +288,38 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+export const contactUs = async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: `"Book Store" <${process.env.SMTP_USER}>`,
+      to: "rajaalihaider55@gmail.com",
+      replyTo: email,
+      subject: `Contact: ${subject}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;">
+          <h2>New Contact Message</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message}</p>
+        </div>
+      `,
+    });
+
+    return res.status(200).json({ message: "Message sent successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: "Message failed to send", error: err.message });
+  }
+};
+
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find().select(

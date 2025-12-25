@@ -287,3 +287,94 @@ export const resetPassword = async (req, res) => {
       .json({ message: "Reset password failed", error: err.message });
   }
 };
+
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find().select(
+      "_id firstName lastName email role isActive isVerified createdAt updatedAt"
+    );
+    return res.status(200).json({ users });
+  } catch (err) {
+    return res.status(500).json({ message: "Fetch users failed", error: err.message });
+  }
+};
+
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select(
+      "_id firstName lastName email role isActive isVerified createdAt updatedAt"
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user });
+  } catch (err) {
+    return res.status(500).json({ message: "Fetch user failed", error: err.message });
+  }
+};
+
+export const updateUser = async (req, res) => {
+  try {
+    const { firstName, lastName, email, role, isActive, isVerified, password } =
+      req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (email) {
+      const normalizedEmail = email.toLowerCase().trim();
+      const existing = await User.findOne({
+        email: normalizedEmail,
+        _id: { $ne: user._id },
+      });
+      if (existing) {
+        return res.status(409).json({ message: "Email already in use" });
+      }
+      user.email = normalizedEmail;
+    }
+
+    if (firstName !== undefined) user.firstName = firstName.trim();
+    if (lastName !== undefined) user.lastName = lastName.trim();
+    if (role !== undefined) user.role = role;
+    if (isActive !== undefined) user.isActive = isActive;
+    if (isVerified !== undefined) user.isVerified = isVerified;
+
+    if (password) {
+      if (password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      user.password = await bcrypt.hash(password, 10);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "User updated",
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Update user failed", error: err.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const deleted = await User.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ message: "User deleted" });
+  } catch (err) {
+    return res.status(500).json({ message: "Delete user failed", error: err.message });
+  }
+};

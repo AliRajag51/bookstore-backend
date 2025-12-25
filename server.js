@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const dbUrl = process.env.DATABASE_URL;
 
 app.use(cors());
 app.use(express.json());
+app.use("/api", userRoutes);
 
 app.get("/", (req, res) => {
   res.json({ status: "ok", message: "Backend is running" });

@@ -17,8 +17,8 @@ const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
 
 app.use(
   cors({
-    origin: clientUrl,
-    credentials: true,
+    origin: "frontend URL", // kaun allowed hai
+    credentials: true, // cookies allow
   })
 );
 app.use(express.json());

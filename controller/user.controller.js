@@ -14,7 +14,6 @@ const cookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
-
 export const registerUser = async (req, res) => {
   try {
     const { firstName, lastName, email, password, acceptedTerms } = req.body;
@@ -22,13 +21,17 @@ export const registerUser = async (req, res) => {
     if (!firstName || !lastName || !email || !password) {
       return res
         .status(400)
-        .json({ message: "First name, last name, email, and password required" });
+        .json({
+          message: "First name, last name, email, and password required",
+        });
     }
     if (acceptedTerms !== true) {
       return res.status(400).json({ message: "Terms must be accepted" });
     }
     if (password.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters" });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -200,7 +203,9 @@ export const loginUser = async (req, res) => {
       token,
     });
   } catch (err) {
-    return res.status(500).json({ message: "Login failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Login failed", error: err.message });
   }
 };
 
@@ -261,10 +266,14 @@ export const resetPassword = async (req, res) => {
     const { token, password } = req.body;
 
     if (!token || !password) {
-      return res.status(400).json({ message: "Token and new password required" });
+      return res
+        .status(400)
+        .json({ message: "Token and new password required" });
     }
     if (password.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters" });
     }
 
     const user = await User.findOne({
@@ -273,7 +282,9 @@ export const resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Reset link is invalid or expired" });
+      return res
+        .status(400)
+        .json({ message: "Reset link is invalid or expired" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -282,7 +293,9 @@ export const resetPassword = async (req, res) => {
     user.passwordResetExpires = null;
     await user.save();
 
-    return res.status(200).json({ message: "Password reset successful. Please log in." });
+    return res
+      .status(200)
+      .json({ message: "Password reset successful. Please log in." });
   } catch (err) {
     return res
       .status(500)
@@ -318,7 +331,9 @@ export const contactUs = async (req, res) => {
 
     return res.status(200).json({ message: "Message sent successfully" });
   } catch (err) {
-    return res.status(500).json({ message: "Message failed to send", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Message failed to send", error: err.message });
   }
 };
 
@@ -329,7 +344,9 @@ export const getUsers = async (req, res) => {
     );
     return res.status(200).json({ users });
   } catch (err) {
-    return res.status(500).json({ message: "Fetch users failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Fetch users failed", error: err.message });
   }
 };
 
@@ -343,7 +360,9 @@ export const getUserById = async (req, res) => {
     }
     return res.status(200).json({ user });
   } catch (err) {
-    return res.status(500).json({ message: "Fetch user failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Fetch user failed", error: err.message });
   }
 };
 
@@ -377,7 +396,9 @@ export const updateUser = async (req, res) => {
 
     if (password) {
       if (password.length < 8) {
-        return res.status(400).json({ message: "Password must be at least 8 characters" });
+        return res
+          .status(400)
+          .json({ message: "Password must be at least 8 characters" });
       }
       user.password = await bcrypt.hash(password, 10);
     }
@@ -397,7 +418,9 @@ export const updateUser = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({ message: "Update user failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Update user failed", error: err.message });
   }
 };
 
@@ -409,7 +432,9 @@ export const deleteUser = async (req, res) => {
     }
     return res.status(200).json({ message: "User deleted" });
   } catch (err) {
-    return res.status(500).json({ message: "Delete user failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Delete user failed", error: err.message });
   }
 };
 
@@ -431,6 +456,8 @@ export const getStats = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({ message: "Fetch stats failed", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Fetch stats failed", error: err.message });
   }
 };
